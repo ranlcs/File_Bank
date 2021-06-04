@@ -27,6 +27,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Connexion extends JPanel implements ItemListener{
+	public static String idActif ="";
 	private TextTransFileBank identifiant = new TextTransFileBank(14,"e-mail");
 	private TextTransFileBank mdp = new TextTransFileBank(14,"Mot de passe");
 	private JButton but = new JButton("Connexion");
@@ -120,35 +121,30 @@ public class Connexion extends JPanel implements ItemListener{
 	public boolean verifierDonne(){
 		String mail = identifiant.getText();
 		String pass = mdp.getText();
-		Connection file_bank=null;
+		Connection file_bank=BDDAccess.getInstance();
 		boolean res=false;
 		try{
-			file_bank=DriverManager.getConnection("jdbc:mysql://localhost:3306/file_bank","root","12345678");
-			try{
-				PreparedStatement p = file_bank.prepareStatement("SELECT * FROM compte WHERE id = ?");
-				p.setString(1,mail);
-				ResultSet s = p.executeQuery();
-				if(s.next()){
-					String salt=s.getString("salt");
-					String cle=s.getString("cle");
-					String pseudo=s.getString("nom");
-					if(HashPassword.verifyPassword(pass,cle,salt)){
-						res=true;
-						identifiant.setText("");
-						mdp.setText("");
-					}
-					else{
-						System.out.println("diso le password");
-					}
-
-				}else{
-					System.out.println("desole, vous n'etes pas des notre");
+			PreparedStatement p = file_bank.prepareStatement("SELECT * FROM compte WHERE id = ?");
+			p.setString(1,mail);
+			ResultSet s = p.executeQuery();
+			if(s.next()){
+				String salt=s.getString("salt");
+				String cle=s.getString("cle");
+				String pseudo=s.getString("nom");
+				if(HashPassword.verifyPassword(pass,cle,salt)){
+					res=true;
+					identifiant.setText("");
+					mdp.setText("");
 				}
-			}catch(Exception e){
-				System.out.println("Erreur select: "+e);
+				else{
+					System.out.println("diso le password");
+				}
+
+			}else{
+				System.out.println("desole, vous n'etes pas des notre");
 			}
-		}catch(SQLException sql){
-			System.out.println("Connection a la base:"+sql);
+		}catch(Exception e){
+			System.out.println("Erreur select: "+e);
 		}
 		return res;
 	}

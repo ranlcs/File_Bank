@@ -120,34 +120,21 @@ public class SignUp extends JPanel implements ItemListener{
 				resultat.requestFocus();
 				resultat.setText("Password de longueur au moins 8");
 			}else{
-				Connection file_bank=null;
+				Connection file_bank=BDDAccess.getInstance();
 				try{
-					file_bank=DriverManager.getConnection("jdbc:mysql://localhost:3306/file_bank","root","12345678");
-					try{
-						/*PreparedStatement p = file_bank.prepareStatement("SELECT * FROM compte WHERE id = ?");
-						p.setString(1,mail);
-						ResulSet s = p.executeQuery();
-						if(s.next()){
-							System.out.println("compte deja existant");
-						}else{*/
-
-							PreparedStatement p=file_bank.prepareStatement("INSERT INTO compte (id,salt,cle,admin,nom) VALUES(?,?,?,?,?)");
-							p.setString(1,tMail);
-							String salt=HashPassword.generateSalt(512).get();
-							String cle=HashPassword.hashPassword(tPass,salt).get();
-							p.setString(2,salt);
-							p.setString(3,cle);
-							p.setInt(4,0);
-							p.setString(5,tPseudo);
-							int resUp = p.executeUpdate();
-							System.out.println("resUP:"+resUp);
-						// }
-					}catch(SQLException e){/////misy an le erreur miverina efa ao le id de ny afa inonna
-						System.out.println("Erreur sur insert: "+e);
-					}			
-				}catch(SQLException sql){
-					System.out.println("Connection a la base:"+sql);
-				}
+					PreparedStatement p=file_bank.prepareStatement("INSERT INTO compte (id,salt,cle,admin,nom) VALUES(?,?,?,?,?)");
+					p.setString(1,tMail);
+					String salt=HashPassword.generateSalt(512).get();
+					String cle=HashPassword.hashPassword(tPass,salt).get();
+					p.setString(2,salt);
+					p.setString(3,cle);
+					p.setInt(4,0);
+					p.setString(5,tPseudo);
+					int resUp = p.executeUpdate();
+					System.out.println("resUP:"+resUp);
+				}catch(SQLException e){/////misy an le erreur miverina efa ao le id de ny afa inonna
+					System.out.println("Erreur sur insert: "+e);
+				}			
 				System.out.println("tsisy diso lo atreto");
 			}
 		}
